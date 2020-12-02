@@ -5,19 +5,18 @@ defaults.device = torch.device('cpu')
 learner = load_learner(Path(''))
 
 from flask import Flask, jsonify, request
-from PIL import Image
-import requests
-import io
 
 app = Flask(__name__)
 
 
-@app.route("/predict", methods=["GET"])
+@app.route("/predict", methods=["POST"])
 def predict():
-    img_bytes = requests.get(request.args.get('url'))
-    img_file = io.BytesIO(img_bytes.content)
+    # img_bytes = requests.get(request.args.get('url'))
+    # img_file = io.BytesIO(img_bytes.content)
 
-    # make inference on image and return an HTML response
+    file = request.files['image']
+    img_file = file.stream
+
     img = open_image(img_file)
     pred_class, pred_idx, outputs = learner.predict(img)
     formatted_outputs = ["{:.1f}".format(value) for value in
