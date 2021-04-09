@@ -11,8 +11,6 @@ app = Flask(__name__)
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    # img_bytes = requests.get(request.args.get('url'))
-    # img_file = io.BytesIO(img_bytes.content)
 
     file = request.files['image']
     img_file = file.stream
@@ -26,8 +24,20 @@ def predict():
                         reverse=True
                         )
 
+    stats = int(open('num-classifications.txt', 'r').read())
+
+    num_classifications = open('num-classifications.txt', 'w')
+    num_classifications.write(str(stats + 1))
+
+    num_classifications.close()
+
     return jsonify({pred_probs[0][0]: float(pred_probs[0][1]), pred_probs[1][0]: float(pred_probs[1][1]), pred_probs[2][0]: float(pred_probs[2][1])})
 
+
+@app.route("/stats", methods=["GET"])
+def stats():
+
+    return "{} images classified!".format(open('num-classifications.txt', 'r').read())
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)
